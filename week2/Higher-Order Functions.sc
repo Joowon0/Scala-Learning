@@ -1,4 +1,4 @@
-
+// this is for lecture 2.1 Higher-Order Functions
 object higherOrderFunctions {
   // sum from a to b
   def sum(f: Int => Int, a: Int, b: Int): Int =
