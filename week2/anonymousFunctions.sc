@@ -1,3 +1,4 @@
+// this is for lecture 2.1 Higher-Order Functions
 object anonymousFunctions{
   // sum from a to b
   // tail-recursion
