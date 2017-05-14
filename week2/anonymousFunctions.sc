@@ -1,5 +1,6 @@
 object anonymousFunctions{
   // sum from a to b
+  // tail-recursion
   def sum(f: Int => Int, a: Int, b: Int): Int = {
     def loop(a: Int, acc: Int): Int = {
       if (a > b) acc
