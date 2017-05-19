@@ -143,11 +143,11 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   def mostRetweeted: Tweet = {
     def leftMost = try left.mostRetweeted
                     catch {
-                      case _: NoSuchElementException => new Tweet( null, null, 0)
+                      case _: NoSuchElementException => new Tweet( "", "", 0)
                     }
     def rightMost = try right.mostRetweeted
                     catch {
-                      case _: NoSuchElementException => new Tweet( null, null, 0)
+                      case _: NoSuchElementException => new Tweet( "", "", 0)
                     }
     if (elem.retweets > leftMost.retweets && elem.retweets > rightMost.retweets) elem
     else if (leftMost.retweets > elem.retweets && leftMost.retweets >rightMost.retweets) leftMost
@@ -155,7 +155,10 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   }
 
   def descendingByRetweet: TweetList = {
-    def removedMax = remove (mostRetweeted)
+    def removedMax = try remove (mostRetweeted)
+                      catch {
+                        case _: NullPointerException => new Empty
+                      }
     new Cons(mostRetweeted, removedMax.descendingByRetweet)
   }
     
@@ -216,12 +219,12 @@ object GoogleVsApple {
     if (matchStrings.isEmpty) false
     else givenString.contains(matchStrings.head) || isSubsetOf(givenString, matchStrings.tail)
 
-  def TweetsRec(tweetSets: List[TweetSet], keywords: List[String]): TweetSet=
+  def tweetsRec(tweetSets: List[TweetSet], keywords: List[String]): TweetSet=
     if (tweetSets.isEmpty) new Empty
-    else tweetSets.head filter(x=>isSubsetOf(x.text, keywords)) union TweetsRec(tweetSets.tail, keywords)
+    else tweetSets.head filter(x=>isSubsetOf(x.text, keywords)) union tweetsRec(tweetSets.tail, keywords)
 
-  lazy val googleTweets: TweetSet = TweetsRec(TweetReader.tweetSets, google)
-  lazy val appleTweets: TweetSet = TweetsRec(TweetReader.tweetSets, apple)
+  lazy val googleTweets: TweetSet = tweetsRec(TweetReader.tweetSets, google)
+  lazy val appleTweets: TweetSet = tweetsRec(TweetReader.tweetSets, apple)
   
   /**
    * A list of all tweets mentioning a keyword from either apple or google,
