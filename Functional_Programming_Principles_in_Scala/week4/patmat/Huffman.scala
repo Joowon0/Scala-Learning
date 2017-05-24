@@ -77,22 +77,14 @@ object Huffman {
     *   }
     */
   def times(chars: List[Char]): List[(Char, Int)] = {
-    if (chars.isEmpty) Nil
-    else {
-      def sortedChars = chars.sorted
-
-      sortedChars match {
-        case Nil => List()
-        case _ => {
-          def tailTimesList = times(sortedChars.tail)
-
-          if (sortedChars.head == tailTimesList.head._1)
-            (tailTimesList.head._1, tailTimesList.head._2) :: tailTimesList.tail
-          else
-            (sortedChars.head, 1) :: tailTimesList
-        }
+    def pack(xs: List[Char]): List[List[Char]] = xs match {
+      case Nil => Nil
+      case x :: xs1 => {
+        val (fst, rest) = xs span (y => y == x)
+        fst :: pack(rest)
       }
     }
+    pack(chars.sorted) map (x => (x.head, x.length))
   }
 
   /**
