@@ -184,15 +184,14 @@ object Huffman {
     * the resulting list of characters.
     */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
-    def findCharRec(treePart: CodeTree, bitsPart: List[Bit]): List[Char] =
-      if (bitsPart.isEmpty) Nil
-      else
-        treePart match {
-          case Leaf(c, _) => c :: findCharRec(tree, bitsPart)
-          case Fork(l, r, _, _) => if (bits.head == 0) findCharRec(l, bitsPart.tail)
-          else  findCharRec(r, bitsPart.tail)
-        }
-    findCharRec(tree, bits)
+    def findCharRec(treePart: CodeTree, bitsPart: List[Bit], madeChars: => List[Char]): List[Char] =
+      treePart match {
+        case Leaf(c, _) => if (bitsPart.isEmpty) madeChars ++ List(c)
+                            else findCharRec(tree, bitsPart, madeChars ++ List(c))
+        case Fork(l, r, _, _) => if (bits.head == 0) findCharRec(l, bitsPart.tail, madeChars)
+                                  else  findCharRec(r, bitsPart.tail, madeChars)
+      }
+    findCharRec(tree, bits, Nil)
   }
 
   /**
