@@ -188,7 +188,7 @@ object Huffman {
       treePart match {
         case Leaf(c, _) => if (bitsPart.isEmpty) madeChars ++ List(c)
                             else findCharRec(tree, bitsPart, madeChars ++ List(c))
-        case Fork(l, r, _, _) => if (bits.head == 0) findCharRec(l, bitsPart.tail, madeChars)
+        case Fork(l, r, _, _) => if (bitsPart.head == 0) findCharRec(l, bitsPart.tail, madeChars)
                                   else  findCharRec(r, bitsPart.tail, madeChars)
       }
     findCharRec(tree, bits, Nil)
