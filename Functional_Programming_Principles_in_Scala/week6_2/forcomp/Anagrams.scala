@@ -180,40 +180,37 @@ object Anagrams {
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
     val occurrences = sentenceOccurrences(sentence)
 
-    val len = (sentence foldLeft "") (_ + _) .length
-    // check if length of sentence is smaller
-    def checkLen(s: Sentence): Boolean = {
-      val sLen = (s foldLeft "") (_ + _) .length
-      sLen <= len
+    // check if an occurrence is subtractable
+    def ifBigger(x: Occurrences, y: Occurrences): Boolean = {
+      if (x.isEmpty && y.isEmpty) true
+      else if (x.isEmpty) false
+      else if (y.isEmpty) true
+      else if (x.head._1 == y.head._1 && x.head._2 >= y.head._2) ifBigger(x.tail, y.tail)
+      else if (x.head._1 < y.head._1) ifBigger(x.tail, y)
+      else false
     }
-    // combine all words
-    def combiWords(words: List[Word]): List[Sentence] =
-      words match {
-        case List()     => List(List())
-        case word::tail => {
-          val tailWords = combiWords(tail)
-          val withWord = for{ t1 <- tailWords } yield word::t1
-
-          (withWord ++ tailWords) filter (sent => checkLen(sent))
-        }
+    // make anagram sentences
+    def anagrams(leftOcc: Occurrences, givenWords: List[(Word,Occurrences)]): List[Sentence] = {
+      if (leftOcc.isEmpty) List(List())
+      else {
+        val validWords = givenWords filter {case (word, occ) => ifBigger(leftOcc, occ)}
+        {for {(word, occ) <- validWords}
+          yield {
+            val tailSentences = anagrams(subtract(leftOcc, occ), validWords)
+            tailSentences map (s => word :: s)
+          }} flatten
       }
-    // check if a sentence is anagram
-    def ifAnagram(x: Sentence): Boolean = {
-      val sOccurr = sentenceOccurrences(sentence)
-      val xOccurr = sentenceOccurrences(x)
-      lazy val zOccurr = xOccurr zip sOccurr
-
-      (sOccurr.length == xOccurr.length) &&
-        (zOccurr forall {case (x1, s1) => x1 == s1})
+      //List(List())
     }
 
     // all combinations of the sentence
-    val allCombi = combinations(sentenceOccurrences(sentence))
+    val allCombi = combinations(occurrences)
     // all possible words that can be a part of anagram sentence
     val validWords:List[Word] = (allCombi map dictionaryByOccurrences) flatten
     // all combinations that is anagram with sentence
-    val matchCombi = combiWords(validWords) filter ifAnagram
+    val formatGivenWord = validWords zip (validWords map wordOccurrences)
+    val combi = anagrams(occurrences, formatGivenWord):List[Sentence]
     // permutate all possible combinations
-    matchCombi flatMap (_.permutations)
+    combi flatMap (_.permutations)
   }
 }
