@@ -1,5 +1,6 @@
 package week2
 
+// this is for lecture 2.1 and 2.2
 object HigherOrderFunctions {
   def mapReduce(reduce: (Int, Int) => Int, zero: Int)(map: Int => Int)(a: Int, b: Int): Int = {
     def loop(a: Int, acc: Int): Int =
