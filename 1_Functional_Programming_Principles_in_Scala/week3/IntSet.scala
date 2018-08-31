@@ -1,4 +1,3 @@
-// this is for lecture 3.1
 package week3
 
 abstract class IntSet {
@@ -28,18 +27,15 @@ class NonEmpty(left: IntSet, element: Int, right: IntSet) extends IntSet {
     else throw new Exception("invalid value for value and element")
 
   // TODO : this is too inefficient
-  override def +(value: Int): IntSet =
-    if (value == element) this
-    else if (value < element) new NonEmpty(left + value, element, right)
-    else if (element < value) new NonEmpty(left, element, right + value)
+  private def valueModify(f: (IntSet, Int) => IntSet, base: IntSet, value: Int): IntSet =
+    if (value == element) base
+    else if (value < element) new NonEmpty(f(left, value), element, right)
+    else if (element < value) new NonEmpty(left, element, f(right, value))
     else throw new Exception("invalid value for value and element")
 
-  // TODO : this is too inefficient
-  override def -(value: Int): IntSet =
-    if (value == element) left ++ right
-    else if (value < element) new NonEmpty(left - value, element, right)
-    else if (element < value) new NonEmpty(left, element, right - value)
-    else throw new Exception("invalid value for value and element")
+  override def +(value: Int): IntSet = valueModify(_+_, this, value)
+
+  override def -(value: Int): IntSet = valueModify(_-_, left ++ right, value)
 
   // TODO : this is too inefficient
   override def ++(that: IntSet): IntSet =
