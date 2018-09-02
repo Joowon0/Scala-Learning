@@ -20,22 +20,24 @@ object Empty extends IntSet {
 }
 
 class NonEmpty(left: IntSet, element: Int, right: IntSet) extends IntSet {
-  override def contains(value: Int): Boolean =
-    if (value == element) true
-    else if (value < element) left contains value
-    else if (element < value) right contains value
-    else throw new Exception("invalid value for value and element")
-
-  // TODO : this is too inefficient
-  private def valueModify(f: (IntSet, Int) => IntSet, base: IntSet, value: Int): IntSet =
+  private def traverse[A](value: Int, base: A, leftTraverse: A, rightTraverse: A): A =
     if (value == element) base
-    else if (value < element) new NonEmpty(f(left, value), element, right)
-    else if (element < value) new NonEmpty(left, element, f(right, value))
+    else if (value < element) leftTraverse
+    else if (element < value) rightTraverse
     else throw new Exception("invalid value for value and element")
 
-  override def +(value: Int): IntSet = valueModify(_+_, this, value)
+  override def contains(value: Int): Boolean =
+    traverse(value, true, left contains value, right contains value)
 
-  override def -(value: Int): IntSet = valueModify(_-_, left ++ right, value)
+  
+  private def valueHandler(f: (IntSet, Int) => IntSet, value: Int, base: IntSet) =
+    traverse(value, base,
+      new NonEmpty(f(left, value), element, right),
+      new NonEmpty(left, element, f(right, value)))
+
+  override def +(value: Int): IntSet = valueHandler(_+_, value, this)
+
+  override def -(value: Int): IntSet = valueHandler(_-_, value, left ++ right)
 
   // TODO : this is too inefficient
   override def ++(that: IntSet): IntSet =
