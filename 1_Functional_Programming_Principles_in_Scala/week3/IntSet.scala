@@ -1,3 +1,4 @@
+// this is for lecture 3.1
 package week3
 
 abstract class IntSet {
@@ -20,6 +21,7 @@ object Empty extends IntSet {
 }
 
 class NonEmpty(left: IntSet, element: Int, right: IntSet) extends IntSet {
+  // Is using this function readable?
   private def traverse[A](value: Int, base: A, leftTraverse: A, rightTraverse: A): A =
     if (value == element) base
     else if (value < element) leftTraverse
