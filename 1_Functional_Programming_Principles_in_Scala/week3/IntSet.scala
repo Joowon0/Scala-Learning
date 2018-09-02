@@ -20,7 +20,7 @@ object Empty extends IntSet {
   override def toString: String = "."
 }
 
-class NonEmpty(left: IntSet, element: Int, right: IntSet) extends IntSet {
+class NonEmpty(val left: IntSet, val element: Int, val right: IntSet) extends IntSet {
   // Is using this function readable?
   private def traverse[A](value: Int, base: A, leftTraverse: A, rightTraverse: A): A =
     if (value == element) base
